@@ -41,5 +41,5 @@
 // module.exports = app;
 
 
-const connection = require('./model/connection');
+const connection = require('./config/connection');
 
