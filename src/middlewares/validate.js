@@ -1,17 +1,24 @@
+const { StatusCodes } = require('http-status-codes');
+
 const validation = (schema) => {
+
     return (req, res, next) => {
-        const { error, value } = schema.validation( req.body, {abortEarly: false});
+        const { error, value } = schema.validate( req.body, {abortEarly: false});
 
         if(error){
-            return res.status(400).json({
-                errors: error.details.map(err => err.message)
-            });
+
+            const err = new Error('Validation error');
+            err.status = StatusCodes.BAD_REQUEST;
+            err.details = error.details;
+
+            return next(err);
         }
 
         req.body = value;
         next();
 
     };
+
 };
 
 module.exports = validation;

@@ -1,79 +1,83 @@
 const { Empleado } = require('../../models');
+const { StatusCodes } = require('http-status-codes');
 
-const getAllEmployees = async (req, res) => {
+const EMPLOYEE_NOT_FOUND = 'Employee not found';
+
+const getAllEmployees = async (req, res, next) => {
     try {
         const employees = await Empleado.findAll();
-        res.status(200).json(employees);
+        res.status(StatusCodes.OK).json(employees);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
-const getEmployee = async (req, res) => {
+const getEmployee = async (req, res, next) => {
     try {
         const { id } = req.params;
         const employee = await Empleado.findByPk(id);
 
         if(!employee){
-            return res.status(404).json({ error: 'Empleado no encontrado '});
+            const error = new Error(EMPLOYEE_NOT_FOUND);
+            error.status = StatusCodes.NOT_FOUND;
+            throw error;
         }
 
-        res.status(200).json(employee);
+        res.status(StatusCodes.OK).json(employee);
+
     } catch(error){
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
-const createEmployee = async (req, res) => {
+const createEmployee = async (req, res, next) => {
     try{
         const { nombre, apellido, email, puesto, salario} = req.body;
 
-        if(!nombre || !apellido || !email) {
-            return res.status(400).json({
-                error: 'Los campos nombre, apellido y email son obligatorios'
-            });
-        }
         const newEmployee = await Empleado.create({
             nombre, apellido, email, puesto, salario
         });
 
-        res.status(201).json(newEmployee);
+        res.status(StatusCodes.CREATED).json(newEmployee);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 }
 
-const updateEmployee = async (req, res) => {
+const updateEmployee = async (req, res, next) => {
     try{
         const { id } = req.params;
         const { nombre, apellido, email, puesto, salario } = req.body;
 
         const employee = await Empleado.findByPk(id);
         if(!employee){
-            return res.status(404).json({ error: 'Empleado no encontrado '});
+            const error = new Error(EMPLOYEE_NOT_FOUND);
+            error.status = StatusCodes.NOT_FOUND;
+            throw error;
         }
 
         await employee.update({ nombre, apellido, email, puesto, salario });
-
-        res.status(200).json(employee);
+        res.status(StatusCodes.OK).json(employee);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
-const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res, next) => {
     try{
         const { id } = req.params;
         const employee = await Empleado.findByPk(id);
 
         if(!employee){
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+            const error = new Error(EMPLOYEE_NOT_FOUND);
+            error.status = StatusCodes.NOT_FOUND;
+            throw error;
         }
         await employee.destroy();
 
-        res.status(200).json({ message: 'Empleado eliminado correctamente' });
+        res.status(StatusCodes.OK).json({ message: 'Employee deleted' });
     } catch (error){
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
