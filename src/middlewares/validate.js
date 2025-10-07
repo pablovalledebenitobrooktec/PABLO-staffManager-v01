@@ -1,18 +1,21 @@
 const { StatusCodes } = require('http-status-codes');
 
-const validation = (schemas) => {
+const validation = (schemas = {}) => {
 
     return (req, res, next) => {
+
+        const validationErrors = [];
             
         if(schemas.body){
             const { error, value } = schemas.body.validate( req.body, {abortEarly: false});
 
             if(error){
-                const err = new Error('Validation error');
-                err.status = StatusCodes.BAD_REQUEST;
-                err.details = error.details;
+                validationErrors.push(...error.details);
+                // const err = new Error('Validation error');
+                // err.status = StatusCodes.BAD_REQUEST;
+                // err.details = error.details;
 
-                return next(err);
+                //return next(err);
             }
             req.body = value;
 
@@ -21,13 +24,21 @@ const validation = (schemas) => {
             const { error, value } = schemas.params.validate( req.params, {abortEarly: false});
 
             if(error){
-                const err = new Error('Validation error');
-                err.status = StatusCodes.BAD_REQUEST;
-                err.details = error.details;
+                validationErrors.push(...error.details);
+                // const err = new Error('Validation error');
+                // err.status = StatusCodes.BAD_REQUEST;
+                // err.details = error.details;
 
-                return next(err);
+                //return next(err);
             }
-            req.body = value;
+            req.params = value;
+        }
+
+        if(validationErrors.length > 0){
+            const err = new Error('Validation error');
+            err.status = StatusCodes.BAD_REQUEST;
+            err.details = validationErrors;
+            return next(err);
         }
 
     next();
