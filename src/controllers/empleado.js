@@ -58,6 +58,7 @@ const updateEmployee = async (req, res, next) => {
 
         await employee.update({ nombre, apellido, email, puesto, salario });
         res.status(StatusCodes.OK).json(employee);
+
     } catch (error) {
         next(error);
     }
@@ -76,6 +77,7 @@ const deleteEmployee = async (req, res, next) => {
         await employee.destroy();
 
         res.status(StatusCodes.OK).json({ message: 'Employee deleted' });
+        
     } catch (error){
         next(error);
     }

@@ -23,4 +23,4 @@ const empleadoSchema = Joi.object({
     salario: Joi.number().positive().allow(null)
 });
 
-module.exports = { empleadoSchema };
+module.exports = empleadoSchema ;
