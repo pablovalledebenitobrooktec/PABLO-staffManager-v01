@@ -4,13 +4,14 @@ const validation = (schemas) => {
 
     return (req, res, next) => {
             
-        if(schemas.body){
+        try{
+            if(schemas.body){
             const { error, value } = schemas.body.validate( req.body, {abortEarly: false});
 
             if(error){
                 const err = new Error('Validation error');
                 err.status = StatusCodes.BAD_REQUEST;
-                err.details = error.details;
+                err.details = error.details.map(d => d.message);
 
                 return next(err);
             }
@@ -23,15 +24,17 @@ const validation = (schemas) => {
             if(error){
                 const err = new Error('Validation error');
                 err.status = StatusCodes.BAD_REQUEST;
-                err.details = error.details;
+                err.details = error.details.map(d => d.message);
 
                 return next(err);
             }
             req.params = value;
         }
+            return next();
 
-    next();
-    
+        }catch(err){
+            return next(err);
+        }
     };
 };
 

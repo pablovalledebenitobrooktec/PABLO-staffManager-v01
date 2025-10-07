@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const empleadoSchema = Joi.object({
+const createEmployeeSchema = Joi.object({
     nombre: Joi.string().min(2).max(100).required()
         .messages({
             'string.empty': 'Nombre is empty',
@@ -23,4 +23,4 @@ const empleadoSchema = Joi.object({
     salario: Joi.number().positive().allow(null)
 });
 
-module.exports = empleadoSchema ;
+module.exports = createEmployeeSchema ;
