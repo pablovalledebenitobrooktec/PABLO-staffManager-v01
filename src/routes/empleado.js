@@ -14,11 +14,12 @@ const {
     deleteEmployee
 } = require('../controllers/empleado');
 
+const validation = require('../middlewares/validate');
 
 router.get('/', getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
 router.post('/', validate({body: empleadoSchema}), createEmployee);
-router.put('/:id', validate({
+router.put('/:id', validation({
     params: idParamSchema,
     body: empleadoSchema
 }), updateEmployee);
