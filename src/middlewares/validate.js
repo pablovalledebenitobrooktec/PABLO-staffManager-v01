@@ -27,7 +27,7 @@ const validation = (schemas) => {
 
                 return next(err);
             }
-            req.body = value;
+            req.params = value;
         }
 
     next();
