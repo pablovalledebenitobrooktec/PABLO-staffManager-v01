@@ -1,11 +1,11 @@
-const { Empleado } = require('../../models');
+const { Employee } = require('../../models');
 const { StatusCodes } = require('http-status-codes');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
 
 const getAllEmployees = async (req, res, next) => {
     try {
-        const employees = await Empleado.findAll();
+        const employees = await Employee.findAll();
         res.status(StatusCodes.OK).json(employees);
     } catch (error) {
         next(error);
@@ -15,7 +15,7 @@ const getAllEmployees = async (req, res, next) => {
 const getEmployee = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const employee = await Empleado.findByPk(id);
+        const employee = await Employee.findByPk(id);
 
         if(!employee){
             const error = new Error(EMPLOYEE_NOT_FOUND);
@@ -34,7 +34,7 @@ const createEmployee = async (req, res, next) => {
     try{
         const { nombre, apellido, email, puesto, salario} = req.body;
 
-        const newEmployee = await Empleado.create({
+        const newEmployee = await Employee.create({
             nombre, apellido, email, puesto, salario
         });
 
@@ -49,7 +49,7 @@ const updateEmployee = async (req, res, next) => {
         const { id } = req.params;
         const { nombre, apellido, email, puesto, salario } = req.body;
 
-        const employee = await Empleado.findByPk(id);
+        const employee = await Employee.findByPk(id);
         if(!employee){
             const error = new Error(EMPLOYEE_NOT_FOUND);
             error.status = StatusCodes.NOT_FOUND;
@@ -67,7 +67,7 @@ const updateEmployee = async (req, res, next) => {
 const deleteEmployee = async (req, res, next) => {
     try{
         const { id } = req.params;
-        const employee = await Empleado.findByPk(id);
+        const employee = await Employee.findByPk(id);
 
         if(!employee){
             const error = new Error(EMPLOYEE_NOT_FOUND);

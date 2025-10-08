@@ -6,14 +6,14 @@ const app = express();
 const logger = require('./src/middlewares/logger');
 const errorHandler = require('./src/middlewares/errorHandler');
 
-const employeeRoutes = require('./src/routes/empleado');
+const employeeRoutes = require('./src/routes/employee');
 
 app.use(express.urlencoded({extended: false}));
 
 app.use(express.json());
 app.use(logger);
 
-app.use('/empleados', employeeRoutes);
+app.use('/employees', employeeRoutes);
 
 app.use(errorHandler);
 

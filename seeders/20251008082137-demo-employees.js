@@ -3,50 +3,49 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-
-    return queryInterface.bulkInsert('Empleados', [
+    return queryInterface.bulkInsert('employees', [
       {
-        nombre: 'Alberto',
-        apellido: 'Redondo',
+        name: 'Alberto',
+        lastName: 'Redondo',
         email: 'albertor@demo.com',
-        puesto: 'Administrativo',
-        salario: 23000,
+        position: 'Administrativo',
+        salary: 23000,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        nombre: 'Juan',
-        apellido: 'Sabio',
+        name: 'Juan',
+        lastName: 'Sabio',
         email: 'juans@demo.com',
-        puesto: 'Desarrollador',
-        salario: 35000,
+        position: 'Desarrollador',
+        salary: 35000,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        nombre: 'Naina',
-        apellido: 'Johar',
+        name: 'Naina',
+        lastName: 'Johar',
         email: 'nainaj@demo.com',
-        puesto: 'Directivo',
-        salario: 60000,
+        position: 'Directivo',
+        salary: 60000,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        nombre: 'Pooja',
-        apellido: 'Kumar',
+        name: 'Pooja',
+        lastName: 'Kumar',
         email: 'poojak@demo.com',
-        puesto: 'Desarrollador',
-        salario: 32000,
+        position: 'Desarrollador',
+        salary: 32000,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        nombre: 'Ali',
-        apellido: 'Mukherjee',
+        name: 'Ali',
+        lastName: 'Mukherjee',
         email: 'alim@demo.com',
-        puesto: 'Encargado_limpieza',
-        salario: 20000,
+        position: 'Encargado_limpieza',
+        salary: 20000,
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -54,6 +53,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    return queryInterface.bulkDelete('Empleados', null, {});
-  },
+    
+  }
 };

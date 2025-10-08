@@ -3,7 +3,7 @@ const express = require('express');
 const validate = require('../middlewares/validate');
 const createEmployeeSchema = require('../validations/createEmployeeValidation');
 const idParamSchema = require('../validations/idParamsValidation');
-const updateEmployeeSchema = require('../validations/updateEmpleadoValidation');
+const updateEmployeeSchema = require('../validations/updateEmployeeValidation');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const {
     createEmployee,
     updateEmployee,
     deleteEmployee
-} = require('../controllers/empleado');
+} = require('../controllers/employee');
 
 router.get('/', getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
