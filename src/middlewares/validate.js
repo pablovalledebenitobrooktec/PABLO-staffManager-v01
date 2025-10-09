@@ -5,6 +5,9 @@ const validation = (schemas) => {
         const errors = [];
         ['body', 'params', 'target'].forEach(target => {
             if(schemas[target]){
+                if(target === 'body' && req.body && typeof req.body.salary === 'string' && req.body.salary){
+                    req.body.salary = Number(req.body.salary);
+                }
                 const {error, value} = schemas[target].validate(req[target], {abortEarly: false});
                 if(error){
                     errors.push(...error.details.map(d => ({

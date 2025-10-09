@@ -1,9 +1,10 @@
 const express = require('express');
 
+const upload = require('../middlewares/upload');
 const validate = require('../middlewares/validate');
 const createEmployeeSchema = require('../validations/createEmployeeValidation');
 const idParamSchema = require('../validations/idParamsValidation');
-const updateEmployeeSchema = require('../validations/updateEmpleadoValidation');
+const updateEmployeeSchema = require('../validations/updateEmployeeValidation');
 
 const router = express.Router();
 
@@ -13,12 +14,12 @@ const {
     createEmployee,
     updateEmployee,
     deleteEmployee
-} = require('../controllers/empleado');
+} = require('../controllers/employee');
 
 router.get('/', getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
-router.post('/', validate({body: createEmployeeSchema}), createEmployee);
-router.put('/:id', validate({
+router.post('/', upload.single('profilePicture'), validate({body: createEmployeeSchema}), createEmployee);
+router.put('/:id', upload.single('profilePicture'), validate({
     params: idParamSchema,
     body: updateEmployeeSchema
 }), updateEmployee);
