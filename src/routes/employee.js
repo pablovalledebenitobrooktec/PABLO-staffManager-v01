@@ -18,8 +18,8 @@ const {
 
 router.get('/', getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
-router.post('/', upload.single('profile_picture'), validate({body: createEmployeeSchema}), createEmployee);
-router.put('/:id', upload.single('profile_picture'), validate({
+router.post('/', upload.single('profilePicture'), validate({body: createEmployeeSchema}), createEmployee);
+router.put('/:id', upload.single('profilePicture'), validate({
     params: idParamSchema,
     body: updateEmployeeSchema
 }), updateEmployee);

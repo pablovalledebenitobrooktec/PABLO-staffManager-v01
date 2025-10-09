@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     position: DataTypes.STRING,
     salary: DataTypes.INTEGER,
-    profile_picture: DataTypes.STRING
+    profilePicture: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Employee',

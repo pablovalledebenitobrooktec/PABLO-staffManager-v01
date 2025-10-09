@@ -21,7 +21,7 @@ const createEmployeeSchema = Joi.object({
         }),
     position: Joi.string().allow(null, ''),
     salary: Joi.number().positive().allow(null),
-    profile_picture: Joi.any().optional()
+    profilePicture: Joi.any().optional()
 });
 
 module.exports = createEmployeeSchema ;

@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOADS_DIR = path.join(__dirname, '..', '..', 'uploads');
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
 const FORMAT_ERROR = 'Image format not allowed (only .png)';
 const ALLOWED_FORMATS = /\.(png|jpg|jpeg)$/;
