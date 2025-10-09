@@ -1,7 +1,11 @@
 const { Employee } = require('../../models');
 const { StatusCodes } = require('http-status-codes');
+const path = require('path');
+const fs = require('fs');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
+const EMPLOYEE_DELETED = 'Employee deleted';
+const DEFAULT_PFP = '/images/default-pfp.png';
 
 const getAllEmployees = async (req, res, next) => {
     try {
@@ -32,22 +36,33 @@ const getEmployee = async (req, res, next) => {
 
 const createEmployee = async (req, res, next) => {
     try{
-        const { nombre, apellido, email, puesto, salario} = req.body;
-
+        const { name, lastName, email, position, salary } = req.body;
         const newEmployee = await Employee.create({
-            nombre, apellido, email, puesto, salario
+            name, lastName, email, position, salary,
+            profile_picture: DEFAULT_PFP
         });
+        if(req.file){
+            const ext = path.extname(req.file.originalname);
+            const newFileName = `pfp_user_${newEmployee.id}${ext}`;
+            const newPath = path.join(path.dirname(req.file.path), newFileName);
+
+            fs.renameSync(req.file.path, newPath);
+
+            newEmployee.profile_picture = `/uploads/${newFileName}`;
+            await newEmployee.save();
+        }
 
         res.status(StatusCodes.CREATED).json(newEmployee);
-    } catch (error) {
+    } catch (error){
         next(error);
     }
+
 }
 
 const updateEmployee = async (req, res, next) => {
     try{
         const { id } = req.params;
-        const { nombre, apellido, email, puesto, salario } = req.body;
+        const { name, lastName, email, position, salary } = req.body;
 
         const employee = await Employee.findByPk(id);
         if(!employee){
@@ -56,7 +71,24 @@ const updateEmployee = async (req, res, next) => {
             throw error;
         }
 
-        await employee.update({ nombre, apellido, email, puesto, salario });
+        await employee.update({ name, lastName, email, position, salary });
+        if(req.file){
+            if(employee.profile_picture && employee.profile_picture !== DEFAULT_PFP){
+                const oldPath = path.join(__dirname, '..', '..', employee.profile_picture);
+                if(fs.existsSync(oldPath)){
+                    fs.unlinkSync(oldPath);
+                }
+            }
+            
+            const ext = path.extname(req.file.originalname);
+            const newFileName = `pfp_user_${newEmployee.id}${ext}`;
+            const newPath = path.join(path.dirname(req.file.path), newFileName);
+
+            fs.renameSync(req.file.path, newPath);
+            employee.profile_picture = `/uploads/${newFileName}`;
+            await employee.save();
+        }
+
         res.status(StatusCodes.OK).json(employee);
 
     } catch (error) {
@@ -74,9 +106,16 @@ const deleteEmployee = async (req, res, next) => {
             error.status = StatusCodes.NOT_FOUND;
             throw error;
         }
+
+        if(employee.profile_picture && employee.profile_picture !== DEFAULT_PFP){
+            const imagePath = path.join(__dirname, '..', '..', employee.profile_picture);
+            if(fs.existsSync(imagePath)){
+                fs.unlinkSync(imagePath);
+            }
+        }
         await employee.destroy();
 
-        res.status(StatusCodes.OK).json({ message: 'Employee deleted' });
+        res.status(StatusCodes.OK).json({ message: EMPLOYEE_DELETED });
         
     } catch (error){
         next(error);
