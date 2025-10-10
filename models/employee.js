@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
   class Employee extends Model {
     
     static associate(models) {
-    
+      Employee.belongsTo(models.Company, {
+        foreignKey: 'companyId',
+        as: 'companies',
+      });
     }
   }
   Employee.init({
@@ -16,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     position: DataTypes.STRING,
     salary: DataTypes.INTEGER,
-    profilePicture: DataTypes.STRING
+    profilePicture: DataTypes.STRING,
+    companyId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Employee',
