@@ -1,4 +1,4 @@
-const { Employee } = require('../../models');
+const { Employee, Company } = require('../../models');
 const { StatusCodes } = require('http-status-codes');
 const path = require('path');
 const fs = require('fs');
@@ -10,7 +10,13 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 
 const getAllEmployees = async (req, res, next) => {
     try {
-        const employees = await Employee.findAll();
+        const employees = await Employee.findAll({
+            include: {
+                model: Company,
+                as: 'companies',
+                attributes: ['id', 'name', 'color']
+            }
+        });
 
         const employeesWithFullUrl = employees.map(emp => {
             const employeeData = emp.toJSON();
@@ -27,7 +33,13 @@ const getAllEmployees = async (req, res, next) => {
 const getEmployee = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const employee = await Employee.findByPk(id);
+        const employee = await Employee.findByPk(id, {
+            include: {
+                model: Company,
+                as: 'companies',
+                attributes: ['id', 'name', 'color']
+            }
+        });
 
         if(!employee){
             const error = new Error(EMPLOYEE_NOT_FOUND);
