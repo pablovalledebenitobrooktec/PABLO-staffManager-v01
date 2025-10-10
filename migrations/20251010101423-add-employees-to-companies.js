@@ -5,18 +5,14 @@ const company = require('../models/company');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const { Employee } = require('../models');
-    await Employee.update(
-      { companyId: 1},
-      { where: { companyId: null } }
+    await queryInterface.sequelize.query(
+      `UPDATE "employees" SET "companyId" = 1 WHERE "companyId" IS NULL;`
     );
   },
 
   async down (queryInterface, Sequelize) {
-    const { Employee } = require('../models');
-    await Employee.update(
-      { companyId: null },
-      { where: {} }
+    await queryInterface.sequelize.query(
+      `UPDATE "employees" SET "companyId" = NULL WHERE "companyId" = 1;`
     );
   }
 };

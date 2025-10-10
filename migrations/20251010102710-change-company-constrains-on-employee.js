@@ -6,7 +6,6 @@ module.exports = {
     await queryInterface.changeColumn('employees', 'companyId', {
       type: Sequelize.INTEGER,
       allowNull: false,
-      defaultValue: 1,
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });
