@@ -12,7 +12,7 @@ const {
     getCompany
 } = require('../controllers/company');
 
-router.get('/', validate({searchParamsSchema}), getAllCompanies);
+router.get('/', validate({params: searchParamsSchema}), getAllCompanies);
 router.get('/:id', validate({params: idParamSchema}), getCompany);
 
 module.exports = router;
