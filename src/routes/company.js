@@ -3,6 +3,7 @@ const express = require('express');
 const validate = require('../middlewares/validate');
 
 const idParamSchema = require('../validations/idParamsValidation');
+const searchParamsSchema = require('../validations/searchParamsValidation');
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ const {
     getCompany
 } = require('../controllers/company');
 
-router.get('/', getAllCompanies);
+router.get('/', validate({searchParamsSchema}), getAllCompanies);
 router.get('/:id', validate({params: idParamSchema}), getCompany);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const { Employee, Company } = require('../../models');
 const { StatusCodes } = require('http-status-codes');
 const path = require('path');
 const fs = require('fs');
+const { Op } = require('sequelize');
 const getImageUrl = require('../utils/getImageUrl');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
@@ -10,7 +11,26 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 
 const getAllEmployees = async (req, res, next) => {
     try {
+
+        const { name, email, id, companyId } = req.query;
+        const where = {};
+
+        if(name){
+            where.name = { [Op.iLike]: `%${name}%`};
+        }
+        if(email){
+            where.email = { [Op.iLike]: `%${email}%`};
+        }
+        if(id){
+            where.id = id;
+        }
+        if(companyId){
+            const idArray = companyId.split(',').map(Number);
+            where.companyId = { [Op.in]: idArray};
+        }
+
         const employees = await Employee.findAll({
+            where,
             include: {
                 model: Company,
                 as: 'companies',
@@ -59,10 +79,10 @@ const getEmployee = async (req, res, next) => {
 
 const createEmployee = async (req, res, next) => {
     try{
-        const { name, lastName, email, position, salary } = req.body;
+        const { name, lastName, email, position, salary, companyId } = req.body;
         const newEmployee = await Employee.create({
             name, lastName, email, position, salary,
-            profilePicture: DEFAULT_PFP
+            profilePicture: DEFAULT_PFP, companyId
         });
         if(req.file){
             const ext = path.extname(req.file.originalname);
