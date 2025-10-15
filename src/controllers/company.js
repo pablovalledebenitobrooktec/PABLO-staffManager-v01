@@ -1,9 +1,21 @@
 const { StatusCodes } = require('http-status-codes');
-const { Company } = require('../../models');
+const { Company, Employee } = require('../../models');
+const { Op } = require('sequelize');
 
 const getAllCompanies = async (req, res, next) => {
     try{
-        const companies = await Company.findAll();
+
+        const { name, color } = req.query;
+        const where = {};
+
+        if(name){
+            where.name = { [Op.iLike]: `%${name}%`};
+        }
+        if(color){
+            where.color = color;
+        }
+
+        const companies = await Company.findAll({where});
 
         res.status(StatusCodes.OK).json(companies);
 
@@ -15,7 +27,13 @@ const getAllCompanies = async (req, res, next) => {
 const getCompany = async (req, res, next) => {
     try{
         const { id } = req.params;
-        const company = await Company.findByPk(id);
+        const company = await Company.findByPk(id, {
+            include: {
+                model: Employee,
+                as: 'employees',
+                attributes: ['id', 'name', 'email']
+            }
+        });
 
         res.status(StatusCodes.OK).json(company);
     } catch (error) {
