@@ -12,7 +12,7 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 const getAllEmployees = async (req, res, next) => {
     try {
 
-        const { name, email, id, companyId } = req.query;
+        const { name, email, companyIds } = req.query;
         const where = {};
 
         if(name){
@@ -21,12 +21,8 @@ const getAllEmployees = async (req, res, next) => {
         if(email){
             where.email = { [Op.iLike]: `%${email}%`};
         }
-        if(id){
-            where.id = id;
-        }
-        if(companyId){
-            const idArray = companyId.split(',').map(Number);
-            where.companyId = { [Op.in]: idArray};
+        if(companyIds){
+            where.companyIds = { [Op.in]: companyIds};
         }
 
         const employees = await Employee.findAll({
