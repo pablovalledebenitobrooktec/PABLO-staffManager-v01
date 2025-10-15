@@ -21,7 +21,11 @@ const createEmployeeSchema = Joi.object({
         }),
     position: Joi.string().allow(null, ''),
     salary: Joi.number().positive().allow(null),
-    profilePicture: Joi.any().optional()
+    profilePicture: Joi.any().optional(),
+    companyId: Joi.number().required().messages({
+        'any.required': 'Company ID is required',
+        'number.base': 'Company ID must be a number'
+    })
 });
 
 module.exports = createEmployeeSchema ;

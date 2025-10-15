@@ -1,0 +1,18 @@
+const Joi = require('joi');
+
+const searchEmployeeValidation = Joi.object({
+
+    name: Joi.string().min(2).max(100).optional().messages({
+        'string.min': 'Name must contain more than 2 characters',
+        'string.max': 'Name must contain less than 100 characters'
+    }),
+    email: Joi.string().email().optional().messages({
+        'string.email': 'Email format invalid'
+    }),
+    companyIds: Joi.array().items(Joi.number()).messages({
+        'array.base': 'Company ID must be an array of numbers',
+        'array.includes': 'Company ID must be an array of numbers'
+    })
+});
+
+module.exports = searchEmployeeValidation;
