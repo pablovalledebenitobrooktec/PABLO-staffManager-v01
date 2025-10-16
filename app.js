@@ -6,8 +6,11 @@ const app = express();
 
 const logger = require('./src/middlewares/logger');
 const errorHandler = require('./src/middlewares/errorHandler');
+const verifyToken = require('./src/middlewares/authHandler');
+
 const employeeRoutes = require('./src/routes/employee');
 const companyRoutes = require('./src/routes/company');
+const authRoute = require('./src/routes/auth');
 
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
@@ -16,8 +19,9 @@ app.use(logger);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use('/employees', employeeRoutes);
-app.use('/companies', companyRoutes);
+app.use('/login', authRoute);
+app.use('/employees', verifyToken, employeeRoutes);
+app.use('/companies', verifyToken, companyRoutes);
 
 app.use(errorHandler);
 

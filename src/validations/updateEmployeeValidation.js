@@ -1,3 +1,5 @@
+const patternPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*[$@!#.])[A-Za-zd@$!%*?&.]{10,30}/;
+
 const Joi = require('joi');
 
 const updateEmployeeSchema = Joi.object({
@@ -17,7 +19,13 @@ const updateEmployeeSchema = Joi.object({
             'string.email': 'Email format invalid'
         }),
     position: Joi.string().allow(null, ''),
-    salary: Joi.number().positive().allow(null)
+    salary: Joi.number().positive().allow(null),
+    password: Joi.string().regex(RegExp(patternPassword)).min(10).max(30)
+        .messages({
+            'string.empty': 'Password is empty',
+            'object.regex': 'Password is weak',
+            'string.pattern.base': 'Password is weak',
+        }),
 }).min(1)
     .messages({
         'object.min': 'At least one field must be provided for update'
