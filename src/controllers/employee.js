@@ -12,7 +12,7 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 const getAllEmployees = async (req, res, next) => {
     try {
 
-        const { name, email, companyIds } = req.query;
+        const { name, email, companyId } = req.query;
         const where = {};
 
         if(name){
@@ -21,8 +21,9 @@ const getAllEmployees = async (req, res, next) => {
         if(email){
             where.email = { [Op.iLike]: `%${email}%`};
         }
-        if(companyIds){
-            where.companyIds = { [Op.in]: companyIds};
+        if(companyId){
+            const companyIds = Array.isArray(companyId) ? companyId.map(id => Number(id)) : [Number(companyId)];
+            where.companyId= { [Op.in]: companyIds};
         }
 
         const employees = await Employee.findAll({
@@ -36,6 +37,7 @@ const getAllEmployees = async (req, res, next) => {
 
         const employeesWithFullUrl = employees.map(emp => {
             const employeeData = emp.toJSON();
+            delete employeeData.password;
             employeeData.profilePicture = getImageUrl(employeeData.profilePicture);
             return employeeData;
         })
@@ -64,6 +66,7 @@ const getEmployee = async (req, res, next) => {
         }
 
         const employeeData = employee.toJSON();
+        delete employeeData.password;
         employeeData.profilePicture = getImageUrl(employeeData.profilePicture);
 
         res.status(StatusCodes.OK).json(employeeData);
@@ -75,10 +78,10 @@ const getEmployee = async (req, res, next) => {
 
 const createEmployee = async (req, res, next) => {
     try{
-        const { name, lastName, email, position, salary, companyId } = req.body;
+        const { name, lastName, email, position, salary, companyId, password} = req.body;
         const newEmployee = await Employee.create({
             name, lastName, email, position, salary,
-            profilePicture: DEFAULT_PFP, companyId
+            profilePicture: DEFAULT_PFP, companyId, password
         });
         if(req.file){
             const ext = path.extname(req.file.originalname);
@@ -104,7 +107,7 @@ const createEmployee = async (req, res, next) => {
 const updateEmployee = async (req, res, next) => {
     try{
         const { id } = req.params;
-        const { name, lastName, email, position, salary } = req.body;
+        const { name, lastName, email, position, salary, password} = req.body;
 
         const employee = await Employee.findByPk(id);
         if(!employee){
@@ -113,7 +116,7 @@ const updateEmployee = async (req, res, next) => {
             throw error;
         }
 
-        await employee.update({ name, lastName, email, position, salary });
+        await employee.update({ name, lastName, email, position, salary, password});
         if(req.file){
             if(employee.profilePicture && employee.profilePicture !== DEFAULT_PFP){
                 const oldPath = path.join(__dirname, '..', '..', employee.profilePicture);
@@ -132,6 +135,7 @@ const updateEmployee = async (req, res, next) => {
         }
 
         const employeeData = employee.toJSON();
+        delete employeeData.password;
         employeeData.profilePicture = getImageUrl(employeeData.profilePicture);
         res.status(StatusCodes.OK).json(employeeData);
 
