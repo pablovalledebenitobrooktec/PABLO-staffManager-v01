@@ -16,14 +16,14 @@ const db = {};
 // } else {
 //   sequelize = new Sequelize(config.database, config.username, config.password, config);
 // }
-
+console.log(dbConfig.dialect);
 const sequelize = new Sequelize(
   dbConfig.database,
   dbConfig.username,
   dbConfig.password,
   {
     host: dbConfig.host,
-    dialect: dbConfig.dialect,
+    dialect: 'postgres',
     logging: (msg) => logger.info(msg)
   }
 );

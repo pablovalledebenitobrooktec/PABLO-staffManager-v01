@@ -15,7 +15,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'companyId',
         as: 'companies',
       });
-    }
+      Employee.belongsToMany(models.Project, {
+        through: 'employeeProjects',
+        as: 'projects',
+        foreignKey: 'employeeId'
+      });
+    };
   }
   Employee.init({
     name: DataTypes.STRING,
