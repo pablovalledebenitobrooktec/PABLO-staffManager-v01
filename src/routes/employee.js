@@ -19,8 +19,6 @@ const {
     deleteEmployee
 } = require('../controllers/employee');
 
-router.post('/login', )
-
 router.get('/', validate({params: searchEmployeeSchema}), getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
 router.post('/', upload.single('profilePicture'), validate({body: createEmployeeSchema}), createEmployee);

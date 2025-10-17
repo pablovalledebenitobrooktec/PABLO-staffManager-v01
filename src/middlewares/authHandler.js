@@ -1,24 +1,22 @@
-const jwt = require('jsonwebtoken');
-const { StatusCodes } = require('http-status-codes');
-require('dotenv').config();
+const { tokenDecode } = require('../libs/jwtHelper');
+const { StatusCodes, getReasonPhrase } = require('http-status-codes');
 
-const ENCRYPTION_KEY = process.env.JWT_SECRET;
+const getToken = (req) => req.headers.authorization && req.headers.authorization.split(' ')[1];
 
 const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = getToken(req);
 
     if(!token) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Token not provided'});
+        return res.status(StatusCodes.UNAUTHORIZED).json({message: getReasonPhrase(StatusCodes.UNAUTHORIZED)});
     }
 
-    jwt.verify(token, ENCRYPTION_KEY, (err, user) => {
-        if(err){
-            return res.status(StatusCodes.FORBIDDEN).json({message: 'Token invalid or expired'});
-        }
+    try{
+        const user = tokenDecode(token);
         req.user = user;
         next();
-    });
+    }catch(error){
+        return res.status(StatusCodes.FORBIDDEN).json({message: getReasonPhrase(StatusCodes.FORBIDDEN)});
+    }
 };
 
 module.exports = verifyToken;
