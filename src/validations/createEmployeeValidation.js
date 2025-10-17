@@ -1,3 +1,5 @@
+const patternPassword = /(?=.*[a-z])(?=.*[A-Z])(?=.*[$@!#.])[A-Za-zd@$!%*?&.]{10,30}/;
+
 const Joi = require('joi');
 
 const createEmployeeSchema = Joi.object({
@@ -25,7 +27,14 @@ const createEmployeeSchema = Joi.object({
     companyId: Joi.number().required().messages({
         'any.required': 'Company ID is required',
         'number.base': 'Company ID must be a number'
-    })
+    }),
+    password: Joi.string().regex(RegExp(patternPassword)).required().min(10).max(30)
+        .messages({
+            'string.empty': 'Password is empty',
+            'any.required': 'Password is required',
+            'object.regex': 'Password is weak',
+            'string.pattern.base': 'Password is weak',
+        }),
 });
 
 module.exports = createEmployeeSchema ;

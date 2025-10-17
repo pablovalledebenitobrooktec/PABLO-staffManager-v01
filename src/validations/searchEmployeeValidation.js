@@ -9,7 +9,7 @@ const searchEmployeeValidation = Joi.object({
     email: Joi.string().email().optional().messages({
         'string.email': 'Email format invalid'
     }),
-    companyIds: Joi.array().items(Joi.number()).messages({
+    companyId: Joi.array().items(Joi.number()).messages({
         'array.base': 'Company ID must be an array of numbers',
         'array.includes': 'Company ID must be an array of numbers'
     })

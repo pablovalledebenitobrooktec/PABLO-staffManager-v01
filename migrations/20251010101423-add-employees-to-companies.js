@@ -6,13 +6,13 @@ const company = require('../models/company');
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.sequelize.query(
-      `UPDATE "employees" SET "companyId" = 1 WHERE "companyId" IS NULL;`
+      `UPDATE "employees" SET "companyId" = 6 WHERE "companyId" IS NULL;`
     );
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.sequelize.query(
-      `UPDATE "employees" SET "companyId" = NULL WHERE "companyId" = 1;`
+      `UPDATE "employees" SET "companyId" = NULL WHERE "companyId" = 6;`
     );
   }
 };

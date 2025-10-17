@@ -2,6 +2,8 @@ const express = require('express');
 
 const upload = require('../middlewares/upload');
 const validate = require('../middlewares/validate');
+const verifyToken = require('../middlewares/authHandler');
+
 const createEmployeeSchema = require('../validations/createEmployeeValidation');
 const idParamSchema = require('../validations/idParamsValidation');
 const updateEmployeeSchema = require('../validations/updateEmployeeValidation');
