@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { auth } = require('../../config/config').development;
 
-console.log(auth);
-
 const tokenDecode = (token) => jwt.verify(token, auth.secret);
 const dataEncode = (data) => jwt.sign(data, auth.secret, {expiresIn: auth.expiresIn});
 
