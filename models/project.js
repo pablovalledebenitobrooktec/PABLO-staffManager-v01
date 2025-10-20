@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       Project.belongsToMany(models.Employee, {
         through: 'EmployeeProjects',
         as: 'employees',
-        foreignKey: 'projectId'
+        foreignKey: 'projectId',
+        otherKey: 'employeeId'
       })
     }
   }
