@@ -22,7 +22,7 @@ const {
     removeProjectFromEmployee
 } = require('../controllers/employee');
 
-router.get('/', validate({params: searchEmployeeSchema}), getAllEmployees);
+router.get('/', validate({query: searchEmployeeSchema}), getAllEmployees);
 router.get('/:id', validate({params: idParamSchema}), getEmployee);
 router.post('/', upload.single('profilePicture'), validate({body: createEmployeeSchema}), createEmployee);
 router.post('/projects', validate({ body: addProjectsSchema }), assignProjectsToEmployee);
