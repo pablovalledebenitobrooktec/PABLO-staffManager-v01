@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const { Joi } = require('express-validation');
 
 const searchEmployeeValidation = Joi.object({
 
@@ -9,10 +9,16 @@ const searchEmployeeValidation = Joi.object({
     email: Joi.string().email().optional().messages({
         'string.email': 'Email format invalid'
     }),
-    companyId: Joi.array().items(Joi.number()).messages({
+    companyId: Joi.array().items(Joi.number().required()).messages({
         'array.base': 'Company ID must be an array of numbers',
-        'array.includes': 'Company ID must be an array of numbers'
-    })
+        'array.includes': 'Company ID must be an array of numbers',
+        'number.base': 'Each Company ID must be an array of numbers'
+    }), 
+    projectId: Joi.array().items(Joi.number().required()).messages({
+        'array.base': 'Project ID must be an array of numbers',
+        'array.includes': 'Project ID must be an array of numbers',
+        'number.base': 'Each Project ID must be an array of numbers'
+    }),
 });
 
 module.exports = searchEmployeeValidation;

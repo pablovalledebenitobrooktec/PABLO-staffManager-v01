@@ -19,7 +19,7 @@ app.use(logger);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use('/login', authRoute);
+app.use('/auth', authRoute);
 app.use('/employees', verifyToken, employeeRoutes);
 app.use('/companies', verifyToken, companyRoutes);
 
@@ -27,4 +27,4 @@ app.use(errorHandler);
 
 app.listen(SERVER_PORT, () => {
     logger.info(`Server is listening on port ${SERVER_PORT}`);
-})
+});
