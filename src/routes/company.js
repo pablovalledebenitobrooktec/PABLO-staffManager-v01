@@ -1,7 +1,6 @@
 const express = require('express');
 
 const validate = require('../middlewares/validate');
-const verifyToken = require('../middlewares/authHandler');
 
 const idParamSchema = require('../validations/idParamsValidation');
 const searchCompanySchema = require('../validations/searchCompanyValidation');

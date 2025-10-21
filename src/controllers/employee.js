@@ -1,9 +1,11 @@
-const { Employee, Company } = require('../../models');
+const { Employee, Company, Project } = require('../../models');
 const { StatusCodes } = require('http-status-codes');
 const path = require('path');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const getImageUrl = require('../utils/getImageUrl');
+const { tokenDecode } = require('../libs/jwtHelper');
+const { description } = require('../validations/createEmployeeValidation');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
 const EMPLOYEE_DELETED = 'Employee deleted';
@@ -12,7 +14,7 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 const getAllEmployees = async (req, res, next) => {
     try {
 
-        const { name, email, companyId } = req.query;
+        const { name, email, companyId, projectId} = req.query;
         const where = {};
 
         if(name){
@@ -26,13 +28,27 @@ const getAllEmployees = async (req, res, next) => {
             where.companyId= { [Op.in]: companyIds};
         }
 
+        const projectInclude = {
+            model: Project,
+            as: 'projects',
+            attributes: ['id', 'name', 'description'],
+            through: {attributes: []},
+        };
+
+        if(projectId){
+            const projectIds = Array.isArray(projectId) ? projectId.map(id => Number(id)) : [Number(projectId)];
+            projectInclude.where = { id: {[Op.in]: projectIds}};
+        }
+
         const employees = await Employee.findAll({
             where,
-            include: {
+            include: [{
                 model: Company,
                 as: 'companies',
                 attributes: ['id', 'name', 'color']
-            }
+            },
+            projectInclude,
+            ]
         });
 
         const employeesWithFullUrl = employees.map(emp => {
@@ -170,10 +186,61 @@ const deleteEmployee = async (req, res, next) => {
     }
 };
 
+const assignProjectsToEmployee = async (req, res, next) => {
+    try{
+        const { projectIds } = req.body;
+
+        const employee = await Employee.findByPk(req.user.id);
+        if(!employee){
+            return res.status(StatusCodes.NOT_FOUND).json({message: 'User not found'});
+        }
+        await employee.addProjects(projectIds);
+
+        const updatedEmployee = await Employee.findByPk(req.user.id,{
+            include: [{
+                model: Project,
+                as: 'projects',
+                attributes: ['id', 'name', 'description'],
+                through: {attributes: []}
+            }]
+        });
+        res.status(StatusCodes.OK).json(updatedEmployee);
+
+    }catch(error){
+        next(error);
+    }
+};
+
+const removeProjectFromEmployee = async (req, res, next) => {
+    try{
+        const { projectIds } = req.body;
+
+        const employee = await Employee.findByPk(req.user.id);
+        if(!employee){
+            return res.status(StatusCodes.NOT_FOUND).json({message: 'User not found'});
+        }
+        await employee.removeProjects(projectIds);
+        const updatedEmployee = await Employee.findByPk(req.user.id, {
+            include: [{
+                model: Project,
+                as: 'projects',
+                attributes: ['id', 'name', 'description'],
+                through: {attributes: []}
+            }]
+        });
+        res.status(StatusCodes.NO_CONTENT).json(updatedEmployee);
+
+    }catch(error){
+        next(error);
+    }
+}
+
 module.exports = {
     getAllEmployees,
     getEmployee,
     createEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    assignProjectsToEmployee,
+    removeProjectFromEmployee
 };

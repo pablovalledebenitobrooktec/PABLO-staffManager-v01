@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js');
-const dbConfig = config.db[env];
+const dbConfig = config[env];
 const logger = require('../src/middlewares/logger');
 const db = {};
 
@@ -16,14 +16,13 @@ const db = {};
 // } else {
 //   sequelize = new Sequelize(config.database, config.username, config.password, config);
 // }
-
 const sequelize = new Sequelize(
   dbConfig.database,
   dbConfig.username,
   dbConfig.password,
   {
     host: dbConfig.host,
-    dialect: dbConfig.dialect,
+    dialect: 'postgres',
     logging: (msg) => logger.info(msg)
   }
 );
