@@ -9,7 +9,6 @@ const verifyToken = (req, res, next) => {
     if(!token) {
         return res.status(StatusCodes.UNAUTHORIZED).json({message: getReasonPhrase(StatusCodes.UNAUTHORIZED)});
     }
-
     try{
         const user = tokenDecode(token);
         req.user = user;

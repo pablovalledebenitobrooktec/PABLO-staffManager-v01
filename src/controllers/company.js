@@ -34,6 +34,9 @@ const getCompany = async (req, res, next) => {
                 attributes: ['id', 'name', 'email']
             }
         });
+        if(!company){
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Company not found' });
+        }
 
         res.status(StatusCodes.OK).json(company);
     } catch (error) {

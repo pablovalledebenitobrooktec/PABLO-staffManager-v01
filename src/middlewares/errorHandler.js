@@ -11,7 +11,7 @@ const errorHandler = (err, req, res, next) => {
     }
 
     if(err.name === 'SequelizeUniqueConstraintError'){
-        return res.status(StatusCodes.BAD_REQUEST).json({ error: "Email already exists" });
+        return res.status(StatusCodes.CONFLICT).json({ error: "Email already exists" });
     }
 
     if(err.name === 'SequelizeValidationError') {
@@ -21,8 +21,6 @@ const errorHandler = (err, req, res, next) => {
     if(err.details){
         return res.status(StatusCodes.BAD_REQUEST).json({ errors: err.details })
     }
-
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
 };
 
 module.exports = errorHandler;

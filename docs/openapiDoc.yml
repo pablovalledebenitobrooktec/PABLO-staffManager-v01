@@ -1,0 +1,402 @@
+openapi: 3.0.3
+info:
+  title: Staff Management API
+  version: 1.0.0
+  description: |
+    REST API for managing employees, companies, and authentication.
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Jon
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: jond@demo.com
+        position:
+          type: string
+          example: Developer
+        salary:
+          type: number
+          example: 20300
+        companyId:
+          type: integer
+          example: 8
+        password:
+          type: string
+          writeOnly: true
+          example: yourP@ssword999
+        profilePicture:
+          type: string
+          format: binary
+          nullable: true
+
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: TechCorp
+        color:
+          type: string
+          example: "#FFDB33"
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Project Alpha
+        description:
+          type: string
+          example: A top secret project.
+
+    _EmployeeWithProjects:
+      x-hidden: true
+      allOf:
+        - $ref: '#/components/schemas/Employee'
+        - type: object
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/Project'
+    
+    _EmployeeWithCompanies:
+      x-hidden: true
+      allOf:
+        - $ref: '#/components/schemas/Employee'
+        - type: object
+          properties:
+            company:
+              $ref: '#/components/schemas/Company'
+    
+    _EmployeeWithCompaniesProjects:
+      x-hidden: true
+      allOf:
+        - $ref: '#/components/schemas/Employee'
+        - type: object
+          properties:
+            company:
+              $ref: '#/components/schemas/Company'
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/Project'
+
+    _CompanyWithEmployees:
+      x-hidden: true
+      allOf:
+        - $ref: '#/components/schemas/Company'
+        - type: object
+          properties:
+            employees:
+              type: array
+              items:
+                $ref: '#/components/schemas/Employee'
+
+security:
+  - bearerAuth: []
+
+paths:
+  /employees:
+    get:
+      summary: List all employees
+      description: Retrieves all employees, optionally filtered by name, email, company ID, or project ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Optional filter by employee name
+        - name: email
+          in: query
+          schema:
+            type: string
+          description: Optional filter by employee email
+        - name: companyId
+          in: query
+          schema:
+            type: integer
+          description: Optional filter by company ID
+        - name: projectId
+          in: query
+          schema:
+            type: integer
+          description: Optional filter by project ID
+      responses:
+        '200':
+          description: Successfully retrieved employee list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/_EmployeeWithCompaniesProjects'
+        '401': 
+          description: Unauthorized
+
+    post:
+      summary: Create a new employee
+      description: Creates a new employee with the provided data.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: Employee successfully created
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400': 
+          description: Invalid input data
+        '401': 
+          description: Unauthorized
+        '409':
+          description: Conflict (duplicate email)
+
+  /employees/{id}:
+    get:
+      summary: Get employee by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employee retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_EmployeeWithCompanies'
+        '401': 
+          description: Unauthorized
+        '404':
+          description: Employee not found
+
+    put:
+      summary: Update employee
+      description: Updates employee data by ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: Employee successfully updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Employee not found
+
+    delete:
+      summary: Delete employee
+      description: Removes an existing employee by ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Employee successfully deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Employee not found
+
+  /employees/projects:
+    post:
+      summary: Assign projects to employee
+      description: Assigns one or more projects to an employee.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Projects successfully assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_EmployeeWithProjects'
+        '400':
+          description: Invalid project IDs
+        '401':
+          description: Unauthorized
+        '404':
+          description: Employee not found
+
+  /employees/projects/remove:
+    post:
+      summary: Remove projects from employee
+      description: Removes project assignments from an employee.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Projects successfully removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_EmployeeWithProjects'
+        '400':
+          description: Invalid project IDs
+        '401':
+          description: Unauthorized
+        '404':
+          description: Employee not found
+
+  /companies:
+    get:
+      summary: List all companies
+      description: Retrieves all registered companies.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Optional filter by company name
+        - name: color
+          in: query
+          schema:
+            type: string
+          description: Optional filter by company color
+      responses:
+        '200':
+          description: Successfully retrieved company list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+        '401':
+          description: Unauthorized
+
+  /companies/{id}:
+    get:
+      summary: Get company by ID
+      description: Retrieves a company by its ID, including its employees.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Company retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_CompanyWithEmployees'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Company not found 
+
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticates a user and returns a JWT access token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: alim@demo.com
+                password:
+                  type: string
+                  example: yourPassword
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Invalid request body
+        '401':
+          description: Invalid credentials          
+
