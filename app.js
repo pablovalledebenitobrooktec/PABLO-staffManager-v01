@@ -1,4 +1,3 @@
-const SERVER_PORT = 5000;
 
 const express = require('express');
 const path = require('path');
@@ -30,6 +29,4 @@ app.use('/companies', verifyToken, companyRoutes);
 
 app.use(errorHandler);
 
-app.listen(SERVER_PORT, () => {
-    logger.info(`Server is listening on port ${SERVER_PORT}`);
-});
+module.exports = app;
