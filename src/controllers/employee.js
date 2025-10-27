@@ -14,30 +14,30 @@ const DEFAULT_PFP = '/images/default-pfp.png';
 const getAllEmployees = async (req, res, next) => {
     try {
 
-        const { name, email, companyId, projectId} = req.query;
+        const { name, email, companyId, projectId } = req.query;
         const where = {};
 
-        if(name){
-            where.name = { [Op.iLike]: `%${name}%`};
+        if (name) {
+            where.name = { [Op.iLike]: `%${name}%` };
         }
-        if(email){
-            where.email = { [Op.iLike]: `%${email}%`};
+        if (email) {
+            where.email = { [Op.iLike]: `%${email}%` };
         }
-        if(companyId){
+        if (companyId) {
             const companyIds = Array.isArray(companyId) ? companyId.map(id => Number(id)) : [Number(companyId)];
-            where.companyId= { [Op.in]: companyIds};
+            where.companyId = { [Op.in]: companyIds };
         }
 
         const projectInclude = {
             model: Project,
             as: 'projects',
             attributes: ['id', 'name', 'description'],
-            through: {attributes: []},
+            through: { attributes: [] },
         };
 
-        if(projectId){
+        if (projectId) {
             const projectIds = Array.isArray(projectId) ? projectId.map(id => Number(id)) : [Number(projectId)];
-            projectInclude.where = { id: {[Op.in]: projectIds}};
+            projectInclude.where = { id: { [Op.in]: projectIds } };
         }
 
         const employees = await Employee.findAll({
@@ -47,7 +47,7 @@ const getAllEmployees = async (req, res, next) => {
                 as: 'companies',
                 attributes: ['id', 'name', 'color']
             },
-            projectInclude,
+                projectInclude,
             ]
         });
 
@@ -87,19 +87,19 @@ const getEmployee = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json(employeeData);
 
-    } catch(error){
+    } catch (error) {
         next(error);
     }
 };
 
 const createEmployee = async (req, res, next) => {
-    try{
-        const { name, lastName, email, position, salary, companyId, password} = req.body;
+    try {
+        const { name, lastName, email, position, salary, companyId, password } = req.body;
         const newEmployee = await Employee.create({
             name, lastName, email, position, salary,
             profilePicture: DEFAULT_PFP, companyId, password
         });
-        if(req.file){
+        if (req.file) {
             const ext = path.extname(req.file.originalname);
             const newFileName = `pfp_user_${newEmployee.id}${ext}`;
             const newPath = path.join('uploads', newFileName);
@@ -114,33 +114,32 @@ const createEmployee = async (req, res, next) => {
         employeeData.profilePicture = getImageUrl(employeeData.profilePicture);
 
         res.status(StatusCodes.CREATED).json(employeeData);
-    } catch (error){
+    } catch (error) {
         next(error);
     }
-
 }
 
 const updateEmployee = async (req, res, next) => {
-    try{
+    try {
         const { id } = req.params;
-        const { name, lastName, email, position, salary, password} = req.body;
+        const { name, lastName, email, position, salary, password } = req.body;
 
         const employee = await Employee.findByPk(id);
-        if(!employee){
+        if (!employee) {
             const error = new Error(EMPLOYEE_NOT_FOUND);
             error.status = StatusCodes.NOT_FOUND;
             throw error;
         }
 
-        await employee.update({ name, lastName, email, position, salary, password});
-        if(req.file){
-            if(employee.profilePicture && employee.profilePicture !== DEFAULT_PFP){
+        await employee.update({ name, lastName, email, position, salary, password });
+        if (req.file) {
+            if (employee.profilePicture && employee.profilePicture !== DEFAULT_PFP) {
                 const oldPath = path.join(__dirname, '..', '..', employee.profilePicture);
-                if(fs.existsSync(oldPath)){
+                if (fs.existsSync(oldPath)) {
                     fs.unlinkSync(oldPath);
                 }
             }
-            
+
             const ext = path.extname(req.file.originalname);
             const newFileName = `pfp_user_${employee.id}${ext}`;
             const newPath = path.join(path.dirname(req.file.path), newFileName);
@@ -161,63 +160,63 @@ const updateEmployee = async (req, res, next) => {
 };
 
 const deleteEmployee = async (req, res, next) => {
-    try{
+    try {
         const { id } = req.params;
         const employee = await Employee.findByPk(id);
 
-        if(!employee){
+        if (!employee) {
             const error = new Error(EMPLOYEE_NOT_FOUND);
             error.status = StatusCodes.NOT_FOUND;
             throw error;
         }
 
-        if(employee.profilePicture && employee.profilePicture !== DEFAULT_PFP){
+        if (employee.profilePicture && employee.profilePicture !== DEFAULT_PFP) {
             const imagePath = path.resolve(employee.profilePicture);
-            if(fs.existsSync(imagePath)){
+            if (fs.existsSync(imagePath)) {
                 fs.unlinkSync(imagePath);
             }
         }
         await employee.destroy();
 
         res.status(StatusCodes.OK).json({ message: EMPLOYEE_DELETED });
-        
-    } catch (error){
+
+    } catch (error) {
         next(error);
     }
 };
 
 const assignProjectsToEmployee = async (req, res, next) => {
-    try{
+    try {
         const { projectIds } = req.body;
 
         const employee = await Employee.findByPk(req.user.id);
-        if(!employee){
-            return res.status(StatusCodes.NOT_FOUND).json({message: 'User not found'});
+        if (!employee) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
         }
         await employee.addProjects(projectIds);
 
-        const updatedEmployee = await Employee.findByPk(req.user.id,{
+        const updatedEmployee = await Employee.findByPk(req.user.id, {
             include: [{
                 model: Project,
                 as: 'projects',
                 attributes: ['id', 'name', 'description'],
-                through: {attributes: []}
+                through: { attributes: [] }
             }]
         });
         res.status(StatusCodes.OK).json(updatedEmployee);
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 
 const removeProjectFromEmployee = async (req, res, next) => {
-    try{
+    try {
         const { projectIds } = req.body;
 
         const employee = await Employee.findByPk(req.user.id);
-        if(!employee){
-            return res.status(StatusCodes.NOT_FOUND).json({message: 'User not found'});
+        if (!employee) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
         }
         await employee.removeProjects(projectIds);
         const updatedEmployee = await Employee.findByPk(req.user.id, {
@@ -225,12 +224,12 @@ const removeProjectFromEmployee = async (req, res, next) => {
                 model: Project,
                 as: 'projects',
                 attributes: ['id', 'name', 'description'],
-                through: {attributes: []}
+                through: { attributes: [] }
             }]
         });
         res.status(StatusCodes.NO_CONTENT).json(updatedEmployee);
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 }
