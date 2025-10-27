@@ -1,7 +1,12 @@
-const request = require('supertest');
-const app = require('../app');
 
-jest.mock('../src/middlewares/authHandler', ()  =>  (req, res, next) => {
+
+jest.mock('swagger-ui-express', () => ({
+    serve: (req, res, next) => next(),
+    setup: () => (req, res, next) => next(),
+}));
+
+
+jest.mock('../src/middlewares/authHandler', () => (req, res, next) => {
     req.user = { id: 1, role: 'admin' };
     next();
 });
@@ -17,6 +22,8 @@ jest.mock('../models', () => ({
     Project: {},
 }));
 
+const request = require('supertest');
+const app = require('../app');
 const { Employee } = require('../models');
 
 describe('Employee API with mocked auth and db', () => {
@@ -72,12 +79,13 @@ describe('Employee API with mocked auth and db', () => {
                     lastName: 'Doe',
                     email: 'john@example.com',
                     position: 'Developer',
+                    salary: 60000,
                     companies: { id: 1, name: 'Tech Corp', color: '#ff0000' },
                     projects: [{ id: 1, name: 'Project X', description: 'Secret' }],
-                    profilePicture: '/images/default-pfp.png',npm
+                    profilePicture: '/images/default-pfp.png',
                 }),
             });
-            
+
             const res = await request(app).get('/employees/1')
                 .set('Authorization', 'Bearer mockedtoken')
                 .expect(200);
@@ -99,5 +107,11 @@ describe('Employee API with mocked auth and db', () => {
             expect(res.body.message).toBe('Employee not found');
         });
     });
+
+    afterAll(async () => {
+        jest.clearAllMocks();
+        await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
 });
 

@@ -21,6 +21,8 @@ const errorHandler = (err, req, res, next) => {
     if(err.details){
         return res.status(StatusCodes.BAD_REQUEST).json({ errors: err.details })
     }
+
+    return res.status(err.status || StatusCodes.INTERNAL_SERVER_ERROR).json({message: err.message });
 };
 
 module.exports = errorHandler;
