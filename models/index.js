@@ -23,7 +23,7 @@ const sequelize = new Sequelize(
   {
     host: dbConfig.host,
     dialect: 'postgres',
-    logging: (msg) => logger.info(msg)
+    logging: env === 'test'? false : (msg) => logger.info(msg),
   }
 );
 
@@ -57,7 +57,9 @@ async function testConnection(){
   }
 }
 
-testConnection();
+if(env !== 'test'){
+  testConnection();
+}
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

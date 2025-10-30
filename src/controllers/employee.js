@@ -5,7 +5,6 @@ const fs = require('fs');
 const { Op } = require('sequelize');
 const getImageUrl = require('../utils/getImageUrl');
 const { tokenDecode } = require('../libs/jwtHelper');
-const { description } = require('../validations/createEmployeeValidation');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
 const EMPLOYEE_DELETED = 'Employee deleted';
@@ -178,7 +177,7 @@ const deleteEmployee = async (req, res, next) => {
         }
         await employee.destroy();
 
-        res.status(StatusCodes.OK).json({ message: EMPLOYEE_DELETED });
+        res.status(StatusCodes.NO_CONTENT).json({ message: EMPLOYEE_DELETED });
 
     } catch (error) {
         next(error);
@@ -203,7 +202,7 @@ const assignProjectsToEmployee = async (req, res, next) => {
                 through: { attributes: [] }
             }]
         });
-        res.status(StatusCodes.OK).json(updatedEmployee);
+        res.status(StatusCodes.OK).json(updatedEmployee.toJSON());
 
     } catch (error) {
         next(error);
@@ -227,7 +226,7 @@ const removeProjectFromEmployee = async (req, res, next) => {
                 through: { attributes: [] }
             }]
         });
-        res.status(StatusCodes.NO_CONTENT).json(updatedEmployee);
+        res.status(StatusCodes.NO_CONTENT).json(updatedEmployee.toJSON());
 
     } catch (error) {
         next(error);
