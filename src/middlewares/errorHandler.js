@@ -7,11 +7,14 @@ const errorHandler = (err, req, res, next) => {
     logger.error(`${req.method} ${req.originalUrl} - ${err.message}`);
 
     if(err.status === StatusCodes.BAD_REQUEST && err.details) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ errors: err.details });
+        return res.status(StatusCodes.BAD_REQUEST).json({ 
+            message: err.message,
+            errors: err.details 
+        });
     }
 
     if(err.name === 'SequelizeUniqueConstraintError'){
-        return res.status(StatusCodes.CONFLICT).json({ error: "Email already exists" });
+        return res.status(StatusCodes.CONFLICT).json({ errors: "Email already exists" });
     }
 
     if(err.name === 'SequelizeValidationError') {
