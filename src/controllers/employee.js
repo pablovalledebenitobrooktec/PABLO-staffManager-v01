@@ -5,7 +5,6 @@ const fs = require('fs');
 const { Op } = require('sequelize');
 const getImageUrl = require('../utils/getImageUrl');
 const { tokenDecode } = require('../libs/jwtHelper');
-const { description } = require('../validations/createEmployeeValidation');
 
 const EMPLOYEE_NOT_FOUND = 'Employee not found';
 const EMPLOYEE_DELETED = 'Employee deleted';

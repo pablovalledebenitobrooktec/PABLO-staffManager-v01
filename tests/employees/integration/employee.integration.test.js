@@ -1,9 +1,4 @@
 
-jest.mock('swagger-ui-express', () => ({
-    serve: (req, res, next) => next(),
-    setup: () => (req, res, next) => next(),
-}));
-
 jest.mock('../../../src/middlewares/authHandler', () => (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ message: 'No token provided' });
